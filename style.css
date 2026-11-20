@@ -1,0 +1,113 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: #f4f6f9;
+  color: #1e293b;
+  line-height: 1.6;
+  padding: 2rem 1rem;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+h1 {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #64748b;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  margin-bottom: 1rem;
+}
+
+textarea:focus {
+  outline: 2px solid #6366f1;
+  border-color: transparent;
+}
+
+button {
+  background: #6366f1;
+  color: #ffffff;
+  border: none;
+  padding: 0.85rem 1.5rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  background: #4f46e5;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #64748b;
+  min-height: 1.2rem;
+}
+
+.results {
+  margin-top: 2rem;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1.5rem;
+}
+
+.results h2 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.description-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  position: relative;
+}
+
+.char-count {
+  display: block;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 0.35rem;
+}
+
+.hidden {
+  display: none;
+}
+
+.error {
+  color: #dc2626;
+}
