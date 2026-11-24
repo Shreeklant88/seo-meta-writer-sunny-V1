@@ -1,4 +1,13 @@
-module.exports = async function handler(req, res) { {
+module.exports = async function handler(req, res) {
+  // Allow CORS for the browser
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -12,7 +21,7 @@ module.exports = async function handler(req, res) { {
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
-    return res.status(500).json({ error: "API key not configured." });
+    return res.status(500).json({ error: "API key not configured in Vercel." });
   }
 
   const prompt = `
@@ -48,12 +57,11 @@ PAGE CONTENT:
     if (!geminiResponse.ok) {
       const errorBody = await geminiResponse.text();
       console.error("Gemini error:", errorBody);
-      return res.status(502).json({ error: "AI service failed. Try again." });
+      return res.status(502).json({ error: "AI service failed. Check Vercel logs." });
     }
 
     const geminiData = await geminiResponse.json();
-    const rawText =
-      geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const rawText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     const descriptions = rawText
       .split("\n")
@@ -70,4 +78,4 @@ PAGE CONTENT:
     console.error("Server error:", error);
     return res.status(500).json({ error: "Internal server error." });
   }
-}
+};
