@@ -1,11 +1,10 @@
-// A list of models to try in order. The best/fastest first, stable fallbacks last.
+// A more robust model chain, prioritizing stable free-tier models first.
 const GEMINI_MODEL_CHAIN = [
-  "gemini-3.5-flash",     // Primary: Fastest, most capable
-  "gemini-3-flash",       // Secondary: Standard, stable
-  "gemini-2.0-flash"      // Tertiary: Very stable, widely available
+  "gemini-3.5-flash-lite",  // Primary: Most reliable free-tier model
+  "gemini-3.6-flash",       // Secondary: Higher quality fallback
+  "gemini-3.8-flash"        // Tertiary: Newest Flash fallback
 ];
 
-// Helper function to make the API call with retry logic for 503 errors
 async function callGeminiWithFallback(prompt, apiKey) {
   let lastError = null;
 
@@ -28,21 +27,20 @@ async function callGeminiWithFallback(prompt, apiKey) {
           return response; // Success
         }
 
-        // If the error is 503 (UNAVAILABLE), we should retry with exponential backoff
+        // If the error is 503 (UNAVAILABLE), retry with exponential backoff
         if (response.status === 503) {
           lastError = await response.text();
           console.warn(`Model ${model} returned 503. Retrying (attempt ${attempt + 1})...`);
-          // Exponential backoff with jitter: 1s, 2s, 4s...
           const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
           await new Promise(resolve => setTimeout(resolve, delay));
         } else {
           // For other errors (e.g., 404), don't retry this model, move to the next.
+          lastError = await response.text();
           break; 
         }
       } catch (error) {
         lastError = error.message;
         console.error(`Fetch error for model ${model}:`, error);
-        // For network errors, break and try the next model
         break;
       }
     }
@@ -53,7 +51,6 @@ async function callGeminiWithFallback(prompt, apiKey) {
 }
 
 module.exports = async function handler(req, res) {
-  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -84,8 +81,6 @@ PAGE CONTENT:
 
   try {
     const geminiResponse = await callGeminiWithFallback(prompt, apiKey);
-    
-    // If we get here, one of the models succeeded
     const geminiData = await geminiResponse.json();
     const rawText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
@@ -103,6 +98,7 @@ PAGE CONTENT:
 
   } catch (error) {
     console.error("Final Server Error:", error.message);
-    return res.status(500).json({ error: "All AI models are currently busy. Please try again in a minute." });
+    // This is the user-friendly message if all models truly fail.
+    return res.status(500).json({ error: "The AI is currently experiencing extremely high demand. Please try again in a minute." });
   }
 };
