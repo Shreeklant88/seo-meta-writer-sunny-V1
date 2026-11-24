@@ -26,13 +26,13 @@ generateBtn.addEventListener("click", async () => {
       body: JSON.stringify({ content: text }),
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.error || "Request failed.");
+      throw new Error(data.error || "Request failed.");
     }
 
-    const data = await response.json();
-    const descriptions = data.descriptions; // array of strings
+    const descriptions = data.descriptions;
 
     resultsEl.classList.remove("hidden");
     descriptions.forEach((desc) => {
