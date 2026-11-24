@@ -4,11 +4,12 @@ const statusEl = document.getElementById("status");
 const resultsEl = document.getElementById("results");
 const outputContainer = document.getElementById("outputContainer");
 
-generateBtn.addEventListener("click", async () => {
+// The main function to generate descriptions
+async function generateDescriptions() {
   const text = inputText.value.trim();
 
-  if (text.length < 50) {
-    statusEl.textContent = "Please paste at least 50 characters of content.";
+  if (text.length < 20) {
+    statusEl.textContent = "Please paste at least 20 characters of content.";
     statusEl.className = "status error";
     return;
   }
@@ -52,5 +53,31 @@ generateBtn.addEventListener("click", async () => {
     statusEl.className = "status error";
   } finally {
     generateBtn.disabled = false;
+  }
+}
+
+// 1. Mouse click event
+generateBtn.addEventListener("click", generateDescriptions);
+
+// 2. Global Enter Key event (works when clicking anywhere on the page)
+document.addEventListener("keydown", (e) => {
+  // Check if the Enter key was pressed
+  if (e.key === "Enter") {
+    // If the user is pressing Enter inside the textarea, we check for Shift
+    if (e.target.tagName === "TEXTAREA") {
+      if (e.shiftKey) {
+        // Allow Shift + Enter to create a new line
+        return;
+      }
+      // Prevent the default new line and trigger generation
+      e.preventDefault();
+    }
+    
+    // Prevent triggering the button if it's already disabled (generating)
+    if (!generateBtn.disabled) {
+      // Prevent default scrolling behaviors
+      e.preventDefault(); 
+      generateDescriptions();
+    }
   }
 });
