@@ -1,7 +1,7 @@
 const GEMINI_MODEL_CHAIN = [
-  "gemini-1.5-flash",
-  "gemini-1.5-pro",
-  "gemini-1.0-pro"
+  "gemini-3.1-flash-lite",  // Stable, 500 RPD (best daily quota)
+  "gemini-3.5-flash",       // Higher quality, 20 RPD
+  "gemini-3-flash-preview"  // Backup, 20 RPD
 ];
 
 async function callGeminiWithFallback(prompt, apiKey) {
@@ -20,7 +20,6 @@ async function callGeminiWithFallback(prompt, apiKey) {
             },
             body: JSON.stringify({
               contents: [{ parts: [{ text: prompt }] }],
-              // THIS IS THE FIX: Force the AI to output strict JSON
               generationConfig: {
                 responseMimeType: "application/json",
                 responseSchema: {
@@ -42,13 +41,16 @@ async function callGeminiWithFallback(prompt, apiKey) {
           return response;
         }
 
-        if (response.status === 503) {
+        // Handle rate limits (429) and server overload (503) with exponential backoff
+        if (response.status === 429 || response.status === 503) {
           lastError = await response.text();
           const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+          console.warn(`Model ${model} returned ${response.status}. Retrying in ${Math.round(delay)}ms...`);
           await new Promise(resolve => setTimeout(resolve, delay));
         } else {
+          // For other errors (e.g., 404), move to the next model immediately
           lastError = await response.text();
-          break; 
+          break;
         }
       } catch (error) {
         lastError = error.message;
@@ -75,7 +77,6 @@ module.exports = async function handler(req, res) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "API key not configured in Vercel." });
 
-  // The prompt is now explicitly asking for JSON
   const prompt = `
 You are an expert SEO copywriter. Write exactly three meta descriptions for the following page content.
 Rules:
@@ -91,11 +92,8 @@ PAGE CONTENT:
   try {
     const geminiResponse = await callGeminiWithFallback(prompt, apiKey);
     const geminiData = await geminiResponse.json();
-    
-    // Extract the raw text (which is guaranteed to be JSON string now)
     const rawText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-    
-    // Parse the JSON string
+
     let descriptions = [];
     try {
       const parsedData = JSON.parse(rawText);
@@ -109,11 +107,10 @@ PAGE CONTENT:
       return res.status(502).json({ error: "AI failed to generate descriptions. Please try again." });
     }
 
-    // Take exactly the first 3 (in case the AI hallucinates more)
     return res.status(200).json({ descriptions: descriptions.slice(0, 3) });
 
   } catch (error) {
     console.error("Final Server Error:", error.message);
-    return res.status(500).json({ error: "The AI is currently experiencing high demand. Please try again in a minute." });
+    return res.status(500).json({ error: "All AI models are currently busy. Please try again in a minute." });
   }
 };
