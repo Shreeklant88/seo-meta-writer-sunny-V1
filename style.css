@@ -1,55 +1,64 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background: #f4f6f9;
-  color: #1e293b;
+  color: #e2e8f0;
   line-height: 1.6;
   padding: 2rem 1rem;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* --- DEEP SPACE GALAXY BACKGROUND --- */
+  background-color: #0a0a1a; /* Deep space blue-black */
+  background-image: 
+    radial-gradient(ellipse at 20% 30%, rgba(76, 29, 149, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, rgba(14, 165, 233, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(236, 72, 153, 0.2) 0%, transparent 50%);
+  background-size: 200% 200%;
+  animation: galaxyDrift 25s ease-in-out infinite alternate;
 }
 
+/* Slow, nebula-like motion */
+@keyframes galaxyDrift {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+/* --- GLASSMORPHISM CARD --- */
 .container {
   max-width: 720px;
-  margin: 0 auto;
-  background: #ffffff;
+  width: 100%;
+  background: rgba(15, 23, 42, 0.6); /* Dark transparent slate */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  padding: 2.5rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
 }
 
-h1 {
-  font-size: 1.75rem;
-  margin-bottom: 0.5rem;
-}
-
-.subtitle {
-  color: #64748b;
-  margin-bottom: 1.5rem;
-  font-size: 0.95rem;
-}
+h1 { font-size: 1.8rem; margin-bottom: 0.5rem; color: #ffffff; }
+.subtitle { color: #94a3b8; margin-bottom: 1.5rem; font-size: 0.95rem; }
 
 textarea {
   width: 100%;
   padding: 1rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 10px;
   font-size: 1rem;
   font-family: inherit;
   resize: vertical;
   margin-bottom: 1rem;
+  background: rgba(0, 0, 0, 0.3); /* Dark input */
+  color: #ffffff;
 }
-
-textarea:focus {
-  outline: 2px solid #6366f1;
-  border-color: transparent;
-}
+textarea::placeholder { color: #64748b; }
+textarea:focus { outline: 2px solid #8b5cf6; border-color: transparent; }
 
 button {
-  background: #6366f1;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
   color: #ffffff;
   border: none;
   padding: 0.85rem 1.5rem;
@@ -57,57 +66,28 @@ button {
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  width: 100%;
 }
+button:hover:not(:disabled) { transform: translateY(-2px); opacity: 0.9; }
+button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-button:hover:not(:disabled) {
-  background: #4f46e5;
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.status {
-  margin-top: 1rem;
-  font-size: 0.9rem;
-  color: #64748b;
-  min-height: 1.2rem;
-}
-
-.results {
-  margin-top: 2rem;
-  border-top: 1px solid #e2e8f0;
-  padding-top: 1.5rem;
-}
-
-.results h2 {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-}
+.status { margin-top: 1rem; font-size: 0.9rem; color: #94a3b8; min-height: 1.2rem; }
+.results { margin-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1.5rem; }
+.results h2 { font-size: 1.2rem; margin-bottom: 1rem; color: #ffffff; }
 
 .description-card {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   padding: 1rem;
   margin-bottom: 0.75rem;
   font-size: 0.95rem;
   position: relative;
+  color: #e2e8f0;
+  transition: background 0.2s;
 }
-
-.char-count {
-  display: block;
-  font-size: 0.8rem;
-  color: #94a3b8;
-  margin-top: 0.35rem;
-}
-
-.hidden {
-  display: none;
-}
-
-.error {
-  color: #dc2626;
-}
+.description-card:hover { background: rgba(255, 255, 255, 0.1); }
+.char-count { display: block; font-size: 0.8rem; color: #8b5cf6; margin-top: 0.35rem; font-weight: bold; }
+.hidden { display: none; }
+.error { color: #f87171; }
